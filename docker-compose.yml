@@ -1,0 +1,65 @@
+version: '3.8'
+
+networks:
+  k6-network:
+
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    networks:
+      - k6-network
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password123
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=k6
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    networks:
+      - k6-network
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+  k6:
+    build: .
+    container_name: k6
+    networks:
+      - k6-network
+    ports:
+      - "6565:6565" # Порт для Web UI k6 (бонус)
+    volumes:
+      - ./scripts:/scripts # Монтируем папку со скриптами
+    depends_on:
+      - influxdb
+    # Эта опция не дает контейнеру завершиться сразу
+    environment:
+      - K6_INFLUXDB_ORGANIZATION=my-org
+      - K6_INFLUXDB_BUCKET=k6
+      - K6_INFLUXDB_TOKEN=LFBsLTPtnenS1l_Ksh6L4kxDoWswL4Kj0VAEoYMprzHIkJXOOcCTrckJfoOiaKk0ctaKL0Qu-q_x7TfJDo59kA==
+    entrypoint: ["sleep", "infinity"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    networks:
+      - k6-network
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+volumes:
+  influxdb-data:
+  grafana-data:

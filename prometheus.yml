@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s # Опрашивать цели каждые 15 секунд
+
+scrape_configs:
+  - job_name: 'my-java-app'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:8080']
