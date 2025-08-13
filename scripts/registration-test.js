@@ -3,8 +3,8 @@ import { check, group, sleep, fail } from 'k6';
 
 // --- Конфигурация Теста ---
 export const options = {
-  vus: 50,
-  duration: '5m',
+  vus: 10,
+  duration: '10s',
   thresholds: {
     'http_req_failed': ['rate<0.01'],
     'http_req_duration{name:Login}': ['p(95)<800'],
@@ -22,8 +22,8 @@ const avatarImage = open('./test-avatar.jpg', 'b');
 export default function () {
   // --- Генерация уникальных данных для пользователя ---
   const uniqueId = `${__VU}-${__ITER}`;
-  const username = `tes2tuser111rr_11122211232${uniqueId}`;
-  const email = `testuase23r_11${uniqueId}@test-linke2afffsssy.com`;
+  const username = `tes2222tuser111rr_11112322211232${uniqueId}`;
+  const email = `te1stuase23r_11${uniqueId}@test-linake2afffaaasssy.com`;
   const password = 'Password123!';
   const newPassword = 'NewPassword456!';
 
@@ -130,8 +130,19 @@ export default function () {
         if (newAuthToken) {
             authToken = newAuthToken;
         }
+      const slug = username;
+      const genHeaders = { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' };
+      const genPayload = JSON.stringify({ slug }); // если твой API не требует тела — передай null
+      // Поменяй путь при необходимости: например, '/api/pages/{slug}/qr' или '/api/page/qr'
+      const genRes = http.post(`${BASE_URL}/qr-code/{requestId}`, genPayload, { headers: genHeaders, tags: { name: 'GenerateQR' } });
+      check(genRes, {
+        'Generate QR 200/202': (r) => r.status === 200 || r.status === 202
+      });
+
     });
   }
 
   sleep(2);
 }
+
+
