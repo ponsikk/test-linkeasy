@@ -4,7 +4,7 @@ import { check, group, sleep, fail } from 'k6';
 // --- Конфигурация Теста ---
 export const options = {
   vus: 20,
-  duration: '10s',
+   iterations: 100,  
   thresholds: {
     'http_req_failed': ['rate<0.01'],
     'http_req_duration{name:Login}': ['p(95)<800'],
@@ -22,8 +22,8 @@ const BASE_URL = 'http://host.docker.internal:8080';
 export default function () {
   // --- Генерация уникальных данных для пользователя ---
   const uniqueId = `${__VU}-${__ITER}`;
-  const username = `tes2222tusehgrdsaf111rr_11112322211232${uniqueId}`;
-  const email = `te112312stasdfklke23sadfhgr_11${uniqueId}@test-linake2afffaaasssy.com`;
+  const username = `tes2222tuse111hgrd11saf1111rr_11112322211232${uniqueId}`;
+  const email = `te1121312stasdf111klke23s123adfhgr_11${uniqueId}@test-linake2afffaaasssy.com`;
   const password = 'Password123!';
   const newPassword = 'NewPassword456!';
 
